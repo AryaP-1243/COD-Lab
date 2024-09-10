@@ -1,7 +1,6 @@
 .data
 array:  .word 5, 2, 9, 1, 5, 6    # Array to be sorted
 n:      .word 6                 
-
 .text
 
     la t0, array       
