@@ -3,18 +3,12 @@ array:  .word 5, 2, 9, 1, 5, 6    # Array to be sorted
 n:      .word 6                 
 
 .text
-.global _start
 
-_start:
-    # Load the base address of the array and the number of elements
     la t0, array       
     lw t1, n           
     addi t1, t1, -1    
-    li t2, 0            # Initialize outer loop counter i = 0
-
-outer_loop:
-    addi t3, t1, -1    
-
+    li t2, 0          
+    addi t3, t1, -1   
     slli t4, t2, 2      
     add t4, t4, t0     
     lw t5, 0(t4)        
