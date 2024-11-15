@@ -1,27 +1,31 @@
-module instruction_fetch (
-    input logic clk,                 
-    input logic reset,               
-    output logic [31:0] pc_out,       
-    output logic [31:0] instr         
+module instr_fetch (
+    input  logic        clk,
+    input  logic        rst,
+    input  logic [31:0] pc_imm,
+    input  logic        sel,
+    output logic [31:0] inst
 );
-    logic [31:0] pc;
-    logic [7:0] instruction_memory [0:1023]; 
-    assign pc_out = pc;
-    assign instr = {instruction_memory[pc + 3], 
-                    instruction_memory[pc + 2], 
-                    instruction_memory[pc + 1], 
-                    instruction_memory[pc]};
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
-            pc <= 32'b0;
-        end else begin
-            pc <= pc + 32'd4;
-        end
-    end
-    initial begin
-        instruction_memory[0]  = 8'h13; // Example: ADDI
-        instruction_memory[1]  = 8'h00;
-        instruction_memory[2]  = 8'h00;
-        instruction_memory[3]  = 8'h00;
-      end
+    logic [31:0] pc, pc_next, sum;
+    program_counter p_c (
+        .clk(clk),
+        .rst(rst),
+        .pc_next(pc_next),
+        .pc(pc)
+    );
+half_adder half (
+        .a(pc),
+        .b(32'h4),
+        .sum(sum)
+    );
+mux mu (
+        .a(sum),
+        .b(pc_imm),
+        .sel(sel),
+        .y(pc_next)
+    );
+memory mem (
+        .clk(clk),
+        .addr(pc),
+        .inst(inst)
+    );
 endmodule
