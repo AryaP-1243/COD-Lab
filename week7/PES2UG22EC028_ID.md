@@ -1,30 +1,50 @@
-For Top-Module:
-module instr_decode (
-    input  logic        clk,
-    input  logic        rst,
-    input  logic [31:0] instruction,    
-    input  logic [31:0] write_data,     
-    input  logic [4:0]  write_reg,      
-    input  logic        reg_write,      
-    output logic [31:0] read_data1,     
-    output logic [31:0] read_data2,     
-    output logic [31:0] sign_ext_imm    
+module instr_decode(
+    input logic clk,
+    input logic reset,
+    input logic [31:0] inst,          
+    input logic [31:0] wr_data,       
+    input logic wr_en,                
+
+output logic [31:0] rs1,          
+    output logic [31:0] rs2,          
+    output logic [31:0] s_imm,        
+    output logic [2:0] funct3,        
+    output logic [6:0] funct7        
 );
-    logic [4:0] read_reg1, read_reg2;
-    logic [15:0] imm_in;
-  register_file rf (
+
+    
+logic [31:0] imm;
+    logic [6:0] opcode;
+    logic [4:0] rd_addr, rs1_addr, rs2_addr;
+
+   
+ decoder d1(
+        .inst(inst),
+        .imm(imm),
+        .funct3(funct3),
+        .funct7(funct7),
+        .opcode(opcode),
+        .rd_addr(rd_addr),
+        .rs1_addr(rs1_addr),
+        .rs2_addr(rs2_addr)
+    );
+    regfile rgf(
         .clk(clk),
-        .rst(rst),
-        .read_reg1(instruction[25:21]), 
-        .read_reg2(instruction[20:16]),  
-        .write_reg(write_reg),           
-        .write_data(write_data),         
-        .reg_write(reg_write),           
-        .read_data1(read_data1),        
-        .read_data2(read_data2)          
+        .reset(reset),
+        .wr_en(wr_en),
+        .rd_addr(rd_addr),
+        .rs1_addr(rs1_addr),
+        .rs2_addr(rs2_addr),
+        .wr_data(wr_data),
+        .rs1(rs1),
+        .rs2(rs2)
     );
-    sign_extend se (
-        .imm_in(instruction[15:0]),      
-        .imm_out(sign_ext_imm)           
+
+    
+sign_extend si(
+        .imm(imm),
+        .opcode(opcode),
+        .s_imm(s_imm)
     );
+
 endmodule
